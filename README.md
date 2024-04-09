@@ -8,7 +8,7 @@ This can be implemented in scenarios where ISPs are transitioning and rolling ou
 
 The IPv6 network serves as the underlay network while IPv4 serves as the overlay network.
 
-It allows communications between routers within a region and the central network while restricting inter-regional communication.
+The VPN configuration allows communications between spokes within a region and the central network while restricting inter-regional communication.
 
 This is achieved through route filtering.
 
