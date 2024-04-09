@@ -4,6 +4,10 @@
 
 The following employs IPv4-VPN mGRE overlay with IPv6 as the underlay (Transport network).
 
+This can be implemented in scenarios where ISPs are transitioning and rolling out IPv6 in their infrastructure.
+
+The IPv6 network serves as the underlay network while IPv4 serves as the overlay network.
+
 It allows communications between routers within a region and the central network while restricting inter-regional communication.
 
 This is achieved through route filtering.
