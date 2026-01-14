@@ -9,19 +9,19 @@ Routers  =  {
                       'username': Username,
                       'secret': Secret,
                       'password': Password,
-                      'ip':'10.10.0.1'
+                      'ip':'192.168.10.1'
                     },
             'CUST-B':{
                       'device_type':'cisco_ios',
                       'username': Username,
                       'secret': Secret,
                       'password': Password,
-                      'ip':'10.10.1.1'
+                      'ip':'192.168.11.1'
                     },
             'CUST-C':{
                       'device_type':'cisco_ios',
                       'username': Username,
                       'secret': Secret,
                       'password': Password,
-                      'ip':'10.11.0.1'
+                      'ip':'192.168.12.1'
             }
