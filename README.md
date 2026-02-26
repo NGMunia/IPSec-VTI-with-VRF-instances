@@ -1,6 +1,7 @@
 # IPSec VTI with VRF instances
 
 
+![Topology](/Network/Topology.PNG)
 
 This project demonstrates a site-to-site VPN architecture using IPSec Virtual Tunnel Interfaces (VTI) combined with VRF-Lite (Virtual Routing and Forwarding) to provide traffic segmentation and secure connectivity for multiple customers over shared infrastructure.
 
@@ -62,7 +63,6 @@ VRF-B → Tunnel-B → Customer B
 Each tunnel interface is bound to its respective VRF, ensuring complete routing separation.
 
 
-![Topology](/Network/Topology.PNG)
 
 
 
