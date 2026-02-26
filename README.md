@@ -2,33 +2,100 @@
 
 
 
-This project demonstrates a site-to-site VPN setup using **IPSec Virtual Tunnel Interfaces (VTI)** combined with **VRF Lite (Virtual Routing and Forwarding)** to segregate customer traffic. Each customer is provisioned with their own VRF instance and an IPSec VTI, ensuring isolated and secure routing domains per customer.
+This project demonstrates a site-to-site VPN architecture using IPSec Virtual Tunnel Interfaces (VTI) combined with VRF-Lite (Virtual Routing and Forwarding) to provide traffic segmentation and secure connectivity for multiple customers over shared infrastructure.
 
-The enables customer sites to securely connect to a central site while maintaining traffic separation through VRF.
+Each customer is assigned:
+
+- A dedicated VRF instance
+- A dedicated IPSec VTI tunnel
+- An independent routing domain
+
+
+This design ensures:
+- Traffic isolation between customers
+- Encrypted communication between sites
+- Overlapping IP address support (if required)
+- Logical multi-tenancy on a single physical router
+
+
+
+## Architectural Concept
+
+### IPsec VTI
+
+An IPSec VTI creates a routed tunnel interface that:
+- Uses IPSec for encryption
+- Behaves like a normal Layer 3 interface
+- Supports dynamic routing protocols (e.g., OSPF)
+
+Unlike crypto map–based IPSec (legacy site-to-site IPsec), VTI allows routing protocols to run directly over the tunnel, simplifying configuration and scalability.
+
+
+### VRF-Lite
+
+VRF-Lite enables multiple independent routing tables on the same router. Each VRF:
+
+- Has its own routing table
+- Maintains separate forwarding decisions
+- Prevents traffic leakage between customers
+
+
+VRFs are locally significant, meaning they only exist on R1. Customer routers do not need to be VRF-aware unless specifically designed to do so.
 
 
 
 ## Topology Description
 
-The network topology includes:
+The topology consists of:
+- R1 – Central site router (hub)
+- Multiple customer site routers (e.g., VRF-A and VRF-B)
+- Dedicated IPSec VTI tunnels between R1 and each customer site
+- Separate VRF instances for each customer
 
-- A central site router R1
-- Multiple customer site routers (VRF-A and VRF-B)
-- IPSec VTI tunnels between the central site and each VRFs
-- VRF instances assigned per VRF on both R1 and spooke routers
-- OSPF routing is used as routing protocol
 
-VRF-A traffic is separate from VRF-B traffic.
+### Logical Structure
+
+VRF-A → Tunnel-A → Customer A
+
+VRF-B → Tunnel-B → Customer B
+
+Each tunnel interface is bound to its respective VRF, ensuring complete routing separation.
 
 
 ![Topology](/Network/Topology.PNG)
 
 
 
-## IPsec VTI 
 
-The topology uses IPsec VTI as a tunnel configuration method; in conjuction with IPsec.
-The following are steps to configure IPsec VTI with VRF:
+## Routing Design
+
+The deployment uses OSPF (Open Shortest Path First) as the routing protocol over each VTI tunnel.
+
+### Key characteristics:
+
+- OSPF runs independently inside each VRF.
+- Routing adjacencies form over the IPSec VTI.
+- Routes learned in VRF-A are not visible in VRF-B.
+- Each customer maintains an isolated routing domain.
+
+
+This design ensures that:
+- Customer A traffic cannot reach Customer B.
+- Routing tables remain fully segmented.
+- Encryption and routing operate transparently together.
+
+
+
+### Traffic Isolation Model
+
+Traffic separation is achieved through:
+- VRF-based routing table isolation
+- Dedicated VTI interfaces per customer
+- Independent OSPF processes within each VRF
+
+Even though all tunnels terminate on the same physical router (R1), customer traffic remains logically separated.
+
+## Configuration:
 
 ### Define the VRFs:
 
@@ -115,7 +182,5 @@ interface Tunnel11
  tunnel protection ipsec profile crypt-profile
 ```
 
-
-
-## GNS3 Images used:
-* Routers : [i86bi_LinuxL3-AdvEnterpriseK9-M2_157_3_May_2018.bin](https://www.gns3.com/marketplace/appliances/cisco-iou-l3)
+As for the Customer routers, They are not VRF-aware. 
+They are configured just as normal, as VRF is locally signinficant.
