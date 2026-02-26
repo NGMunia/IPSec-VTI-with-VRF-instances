@@ -182,5 +182,4 @@ interface Tunnel11
  tunnel protection ipsec profile crypt-profile
 ```
 
-As for the Customer routers, They are not VRF-aware. 
-They are configured just as normal, as VRF is locally signinficant.
+
