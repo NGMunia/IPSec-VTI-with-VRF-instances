@@ -53,7 +53,7 @@ crypto isakmp policy 100
  lifetime 7200
 crypto isakmp key strongkey! address 0.0.0.0
 !
-!
+
 crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha256-hmac
  mode tunnel
 !
