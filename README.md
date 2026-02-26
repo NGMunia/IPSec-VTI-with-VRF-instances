@@ -182,4 +182,98 @@ interface Tunnel11
  tunnel protection ipsec profile crypt-profile
 ```
 
+## Verifying Routing:
 
+To verify OSPF routes on VRF-A
+
+```bash
+R1#sh ip route vrf VRF-A
+
+! Output omitted for brevity
+
+Gateway of last resort is not set
+
+      172.16.0.0/16 is variably subnetted, 4 subnets, 2 masks
+C        172.16.0.0/30 is directly connected, Tunnel0
+L        172.16.0.1/32 is directly connected, Tunnel0
+C        172.16.0.4/30 is directly connected, Tunnel10
+L        172.16.0.5/32 is directly connected, Tunnel10
+      192.168.10.0/32 is subnetted, 1 subnets
+O        192.168.10.1 [110/65536] via 172.16.0.2, 02:19:36, Tunnel0
+      192.168.110.0/32 is subnetted, 1 subnets
+O        192.168.110.1 [110/65536] via 172.16.0.6, 02:19:59, Tunnel10
+
+```
+
+Verying OSPF routes on VRF-B
+
+```bash
+R1#sh ip route vrf VRF-A ospf
+
+Routing Table: VRF-A
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+
+Gateway of last resort is not set
+
+      192.168.10.0/32 is subnetted, 1 subnets
+O        192.168.10.1 [110/65536] via 172.16.0.2, 02:27:46, Tunnel0
+      192.168.110.0/32 is subnetted, 1 subnets
+O        192.168.110.1 [110/65536] via 172.16.0.6, 02:28:09, Tunnel10
+
+```
+
+
+## Verifying Cryptography:
+
+### Verifying IKE phase 1: 
+```bash
+R1#sh crypto isakmp sa Vrf VRF-A
+IPv4 Crypto ISAKMP SA
+dst             src             state          conn-id status
+44.67.28.1      44.67.28.10     QM_IDLE           1011 ACTIVE
+32.19.86.1      32.19.86.10     QM_IDLE           1010 ACTIVE
+
+IPv6 Crypto ISAKMP SA
+
+R1#sh crypto isakmp sa Vrf VRF-B
+IPv4 Crypto ISAKMP SA
+dst             src             state          conn-id status
+44.67.28.20     44.67.28.1      QM_IDLE           1009 ACTIVE
+44.67.28.1      44.67.28.20     QM_IDLE           1008 ACTIVE
+32.19.86.1      32.19.86.20     QM_IDLE           1007 ACTIVE
+
+```
+
+### Verifying IKE phase 2:
+```bash
+R1#sh crypto ipsec sa vrf VRF-A
+
+interface: Tunnel0
+    Crypto map tag: Tunnel0-head-0, local addr 32.19.86.1
+
+   protected vrf: VRF-A
+   local  ident (addr/mask/prot/port): (0.0.0.0/0.0.0.0/0/0)
+   remote ident (addr/mask/prot/port): (0.0.0.0/0.0.0.0/0/0)
+   current_peer 32.19.86.10 port 500
+     PERMIT, flags={origin_is_acl,}
+    #pkts encaps: 960, #pkts encrypt: 960, #pkts digest: 960
+    #pkts decaps: 940, #pkts decrypt: 940, #pkts verify: 940
+    #pkts compressed: 0, #pkts decompressed: 0
+    #pkts not compressed: 0, #pkts compr. failed: 0
+    #pkts not decompressed: 0, #pkts decompress failed: 0
+    #send errors 0, #recv errors 0
+
+     local crypto endpt.: 32.19.86.1, remote crypto endpt.: 32.19.86.10
+     plaintext mtu 1438, path mtu 1500, ip mtu 1500, ip mtu idb Ethernet0/0
+     current outbound spi: 0x735EA5CD(1935582669)
+     PFS (Y/N): Y, DH group: group14
+
+```
